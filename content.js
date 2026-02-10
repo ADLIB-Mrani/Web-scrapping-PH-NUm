@@ -1,5 +1,17 @@
 // Content script for WhatsApp Web phone number scraper
 
+// Enhanced phone number validation
+function isValidPhoneNumber(number) {
+  // Remove all non-digit characters except the leading +
+  const cleaned = number.replace(/[^\d+]/g, '');
+  
+  // Phone number should start with + and have 8-15 digits
+  if (!cleaned.startsWith('+')) return false;
+  
+  const digits = cleaned.substring(1);
+  return digits.length >= 8 && digits.length <= 15;
+}
+
 // Function to extract phone numbers from the current group
 function extractPhoneNumbers() {
   const phoneNumbers = new Set();
@@ -23,43 +35,63 @@ function extractPhoneNumbers() {
       // Extract text content
       const textContent = participant.textContent;
       
-      // Try to find phone numbers in various formats
-      // International format: +1234567890, +33 6 12 34 56 78, etc.
-      const internationalPattern = /\+\d{1,3}[\s\-]?\d{1,14}/g;
-      const matches = textContent.match(internationalPattern);
+      // Enhanced phone number patterns
+      // International format with various separators: +33 6 12 34 56 78, +1-234-567-8900, etc.
+      const patterns = [
+        /\+\d{1,3}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{0,4}/g,
+        /\+\d{8,15}/g  // Simple format without separators
+      ];
       
-      if (matches) {
-        matches.forEach(match => {
-          // Clean up the number
-          const cleanNumber = match.replace(/[\s\-]/g, '');
-          phoneNumbers.add(cleanNumber);
-        });
-      }
+      patterns.forEach(pattern => {
+        const matches = textContent.match(pattern);
+        if (matches) {
+          matches.forEach(match => {
+            // Clean up the number (remove spaces, hyphens, dots, parentheses)
+            const cleanNumber = match.replace(/[\s\-\.\(\)]/g, '');
+            if (isValidPhoneNumber(cleanNumber)) {
+              phoneNumbers.add(cleanNumber);
+            }
+          });
+        }
+      });
       
       // Also look for aria-label attributes which might contain phone numbers
       const ariaLabel = participant.getAttribute('aria-label');
       if (ariaLabel) {
-        const ariaMatches = ariaLabel.match(internationalPattern);
-        if (ariaMatches) {
-          ariaMatches.forEach(match => {
-            const cleanNumber = match.replace(/[\s\-]/g, '');
-            phoneNumbers.add(cleanNumber);
-          });
-        }
+        patterns.forEach(pattern => {
+          const ariaMatches = ariaLabel.match(pattern);
+          if (ariaMatches) {
+            ariaMatches.forEach(match => {
+              const cleanNumber = match.replace(/[\s\-\.\(\)]/g, '');
+              if (isValidPhoneNumber(cleanNumber)) {
+                phoneNumbers.add(cleanNumber);
+              }
+            });
+          }
+        });
       }
     });
 
-    // Alternative method: Look for contact cards
-    const contactElements = document.querySelectorAll('span[dir="auto"]');
-    contactElements.forEach(element => {
-      const text = element.textContent;
-      const matches = text.match(/\+\d{1,3}[\s\-]?\d{1,14}/g);
-      if (matches) {
-        matches.forEach(match => {
-          const cleanNumber = match.replace(/[\s\-]/g, '');
-          phoneNumbers.add(cleanNumber);
-        });
-      }
+    // Alternative method: Look for all text elements with phone numbers
+    const allTextElements = document.querySelectorAll('span[dir="auto"], span[title]');
+    allTextElements.forEach(element => {
+      const text = element.textContent || element.getAttribute('title') || '';
+      const patterns = [
+        /\+\d{1,3}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{1,4}[\s\-\.\(\)]*\d{0,4}/g,
+        /\+\d{8,15}/g
+      ];
+      
+      patterns.forEach(pattern => {
+        const matches = text.match(pattern);
+        if (matches) {
+          matches.forEach(match => {
+            const cleanNumber = match.replace(/[\s\-\.\(\)]/g, '');
+            if (isValidPhoneNumber(cleanNumber)) {
+              phoneNumbers.add(cleanNumber);
+            }
+          });
+        }
+      });
     });
 
     return {
