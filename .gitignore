@@ -1,0 +1,39 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Node modules (if added later)
+node_modules/
+package-lock.json
+
+# Build artifacts
+dist/
+build/
+*.zip
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
