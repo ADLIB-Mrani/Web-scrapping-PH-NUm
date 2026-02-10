@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Phone Scraper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📱 WhatsApp Phone Scraper</h1>
+      <p class="subtitle">Extract phone numbers from groups</p>
+    </header>
+
+    <div class="instructions">
+      <p><strong>How to use:</strong></p>
+      <ol>
+        <li>Open a WhatsApp group on WhatsApp Web</li>
+        <li>Click on the group name to view participants</li>
+        <li>Click "Extract Numbers" below</li>
+      </ol>
+    </div>
+
+    <div class="actions">
+      <button id="extractBtn" class="btn btn-primary">
+        Extract Numbers
+      </button>
+      <button id="openGroupBtn" class="btn btn-secondary">
+        Open Group Info
+      </button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div id="results" class="results hidden">
+      <h3>Extracted Numbers (<span id="count">0</span>)</h3>
+      <div class="numbers-container">
+        <textarea id="numbersDisplay" readonly></textarea>
+      </div>
+      <div class="export-buttons">
+        <button id="copyBtn" class="btn btn-small">📋 Copy All</button>
+        <button id="exportCsvBtn" class="btn btn-small">📄 Export CSV</button>
+        <button id="exportJsonBtn" class="btn btn-small">📦 Export JSON</button>
+      </div>
+    </div>
+
+    <footer>
+      <p class="note">⚠️ Make sure you're on WhatsApp Web and have a group open</p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
