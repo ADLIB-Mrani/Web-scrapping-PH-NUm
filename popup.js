@@ -98,15 +98,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Copy to clipboard
-  copyBtn.addEventListener('click', () => {
-    numbersDisplay.select();
-    document.execCommand('copy');
-    
-    const originalText = copyBtn.textContent;
-    copyBtn.textContent = '✓ Copied!';
-    setTimeout(() => {
-      copyBtn.textContent = originalText;
-    }, 2000);
+  copyBtn.addEventListener('click', async () => {
+    try {
+      // Use modern Clipboard API
+      await navigator.clipboard.writeText(numbersDisplay.value);
+      
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = '✓ Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      numbersDisplay.select();
+      document.execCommand('copy');
+      
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = '✓ Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    }
   });
 
   // Export as CSV

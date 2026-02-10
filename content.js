@@ -1,5 +1,9 @@
 // Content script for WhatsApp Web phone number scraper
 
+// Constants for timing delays
+const GROUP_INFO_LOAD_DELAY_MS = 1000; // Time to wait for group info panel to load
+const DOM_UPDATE_CHECK_DELAY_MS = 100; // Time to wait before checking DOM updates
+
 // Enhanced phone number validation
 function isValidPhoneNumber(number) {
   // Remove all non-digit characters except the leading +
@@ -135,11 +139,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       // Try to open group info
       openGroupInfo();
       
-      // Wait a bit for the panel to open
+      // Wait for the panel to open
       setTimeout(() => {
         const result = extractPhoneNumbers();
         sendResponse(result);
-      }, 1000);
+      }, GROUP_INFO_LOAD_DELAY_MS);
     } else {
       const result = extractPhoneNumbers();
       sendResponse(result);
@@ -157,12 +161,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Also listen for when group info is opened manually
 document.addEventListener('click', (e) => {
-  // Check if group info panel is now visible
+  // Check if group info panel is now visible after DOM updates
   setTimeout(() => {
     const groupInfoVisible = document.querySelector('[data-testid="group-info"]');
     if (groupInfoVisible) {
       // Store that we're in a group
       chrome.storage.local.set({ inGroup: true });
     }
-  }, 100);
+  }, DOM_UPDATE_CHECK_DELAY_MS);
 });
