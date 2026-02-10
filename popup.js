@@ -19,6 +19,16 @@ document.addEventListener('DOMContentLoaded', () => {
     statusDiv.className = `status ${type}`;
   }
 
+  // Validate if URL is WhatsApp Web
+  function isWhatsAppWeb(url) {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname === 'web.whatsapp.com' && urlObj.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  }
+
   // Extract numbers button handler
   extractBtn.addEventListener('click', async () => {
     showStatus('Extracting phone numbers...', 'info');
@@ -29,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       
       // Check if we're on WhatsApp Web
-      if (!tab.url.includes('web.whatsapp.com')) {
+      if (!isWhatsAppWeb(tab.url)) {
         showStatus('Please open WhatsApp Web first!', 'error');
         extractBtn.classList.remove('loading');
         return;
@@ -68,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       
-      if (!tab.url.includes('web.whatsapp.com')) {
+      if (!isWhatsAppWeb(tab.url)) {
         showStatus('Please open WhatsApp Web first!', 'error');
         return;
       }
